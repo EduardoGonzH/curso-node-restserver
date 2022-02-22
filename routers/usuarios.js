@@ -6,8 +6,14 @@ const { usuariosGet,
     usuariosPut,
     usuariosPatch,
     usuarioDelete } = require('../controllers/usuarios');
-const { esRolValido, esMailValido, existeUsuarioPorId } = require('../helpers/db-validators');
-const { validarCampos } = require('../middlewares/validar-campos');
+const { esRolValido,
+    esMailValido,
+    existeUsuarioPorId } = require('../helpers/db-validators');
+
+const { validarCampos,
+    validarJWT,
+    adminRole,
+    tieneRol } = require('../middlewares');
 
 const router = Router();
 
@@ -34,6 +40,9 @@ router.put('/:id', [
 router.patch('/', usuariosPatch);
 
 router.delete('/:id', [
+    validarJWT,
+    // adminRole,
+    tieneRol('VENTAS_ROL', 'ADMIN_ROL'),
     check('id', 'No es un id valido').isMongoId(),
     check('id').custom(existeUsuarioPorId),
     validarCampos
